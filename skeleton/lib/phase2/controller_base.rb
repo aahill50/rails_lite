@@ -27,9 +27,9 @@ module Phase2
     # Raise an error if the developer tries to double render.
     def render_content(content, type)
       raise "already responded" if already_built_response?
-        res.content_type = type
-        res.body = content
-        @already_built_response = true
+      res.content_type = type
+      res.body = content
+      @already_built_response = true
     end
   end
 end
