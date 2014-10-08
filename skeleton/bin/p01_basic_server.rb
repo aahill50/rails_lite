@@ -5,13 +5,12 @@ require 'webrick'
 # http://www.ruby-doc.org/stdlib-2.0/libdoc/webrick/rdoc/WEBrick/HTTPResponse.html
 # http://www.ruby-doc.org/stdlib-2.0/libdoc/webrick/rdoc/WEBrick/Cookie.html
 
-my_brick = WEBrick::HTTPServer.new(Port: 3000)
-
-my_brick.mount_proc '/' do |req, res|
-  res.body
+server = WEBrick::HTTPServer.new(Port: 3000)
+server.mount_proc('/') do |req, res|
+  res.content_type = 'text/text'
+  res.body = req.path
 end
 
-trap('INT') { my_brick.shutdown }
-
-my_brick.start
+trap('INT') { server.shutdown }
+server.start
 

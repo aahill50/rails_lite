@@ -9,7 +9,8 @@ module Phase6
 
     # checks if pattern matches path and method matches request method
     def matches?(req)
-      (http_method == req.request_method.downcase.to_sym) && !!(pattern =~ req.path)
+      req.request_method.downcase.to_sym == self.http_method &&
+      !!(self.pattern =~ req.path.downcase)
     end
 
     # use pattern to pull out route params (save for later?)
@@ -37,12 +38,8 @@ module Phase6
 
     # simply adds a new route to the list of routes
     def add_route(pattern, method, controller_class, action_name)
-      @routes << Route.new(
-        pattern,
-        method,
-        controller_class,
-        action_name
-      )
+      route_args = [pattern, method, controller_class, action_name]
+      @routes << Route.new(*route_args)
     end
 
     # evaluate the proc in the context of the instance

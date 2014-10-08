@@ -8,18 +8,12 @@ module Phase5
     # 3. route params
     def initialize(req, route_params = {})
       @params = {}
+      query_params = parse_www_encoded_form(req.query_string)
+      body_params = parse_www_encoded_form(req.body)
 
+      @params.merge!(query_params)
+      @params.merge!(body_params)
       @params.merge!(route_params)
-
-      if req.body
-        @params.merge!(parse_www_encoded_form(req.body))
-      end
-
-      if req.query_string
-        @params.merge!(parse_www_encoded_form(req.query_string))
-      end
-
-      @params
     end
 
     def [](key)
@@ -27,7 +21,6 @@ module Phase5
     end
 
     def to_s
-      @params.to_json.to_s
     end
 
     class AttributeNotFoundError < ArgumentError; end;
@@ -41,17 +34,19 @@ module Phase5
     def parse_www_encoded_form(www_encoded_form)
       params = {}
 
-      key_values = URI.decode_www_form(www_encoded_form)
-      key_values.each do |full_key, value|
-        scope = params
+      if www_encoded_form
+        key_values = URI.decode_www_form(www_encoded_form)
+        key_values.each do |key_array, value|
+          scope = params
 
-        key_seq = parse_key(full_key)
-        key_seq.each_with_index do |key, idx|
-          if (idx + 1) == key_seq.count
-            scope[key] = value
-          else
-            scope[key] ||= {}
-            scope = scope[key]
+          key_seq = parse_key(key_array)
+          key_seq.each_with_index do |key, idx|
+            if (idx + 1) == key_seq.count
+              scope[key] = value
+            else
+              scope[key] ||= {}
+              scope = scope[key]
+            end
           end
         end
       end
@@ -62,7 +57,9 @@ module Phase5
     # this should return an array
     # user[address][street] should return ['user', 'address', 'street']
     def parse_key(key)
-      key.split(/\[|\]\[|\]/)
+      key.split(/\]\[|\[|\]/)
     end
   end
 end
+
+

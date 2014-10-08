@@ -9,9 +9,8 @@ module Phase3
     # pass the rendered html to render_content
 
     def render(template_name)
-      raise "already responded" if already_built_response?
-      view_file = "views/#{controller_name}/#{template_name}.html.erb"
-      contents = File.read(view_file)
+      template_file = "views/#{controller_name}/#{template_name}.html.erb"
+      contents = File.read(template_file)
 
       erb_template = ERB.new(contents)
 
@@ -19,7 +18,7 @@ module Phase3
     end
 
     def controller_name
-      self.class.to_s.underscore
+      self.class.name.underscore
     end
   end
 end
